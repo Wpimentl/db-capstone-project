@@ -1,0 +1,186 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema LittleLemonDB
+-- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `LittleLemonDB` ;
+
+-- -----------------------------------------------------
+-- Schema LittleLemonDB
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `LittleLemonDB` DEFAULT CHARACTER SET utf8 ;
+USE `LittleLemonDB` ;
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`address`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`address` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`address` (
+  `idaddress` INT NOT NULL AUTO_INCREMENT,
+  `country` VARCHAR(100) NOT NULL,
+  `state` VARCHAR(100) NULL,
+  `city` VARCHAR(100) NOT NULL,
+  `street` VARCHAR(200) NOT NULL,
+  `zipcode` INT NOT NULL,
+  PRIMARY KEY (`idaddress`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`customers`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`customers` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`customers` (
+  `idcustomers` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(200) NOT NULL,
+  `contactnumber` INT NULL,
+  `addressid` INT NULL,
+  PRIMARY KEY (`idcustomers`),
+  INDEX `fk_custxaddress_idx` (`addressid` ASC) VISIBLE,
+  CONSTRAINT `fk_custxaddress`
+    FOREIGN KEY (`addressid`)
+    REFERENCES `LittleLemonDB`.`address` (`idaddress`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`employees`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`employees` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`employees` (
+  `idemployees` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(100) NOT NULL,
+  `salary` INT NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `addressid` INT NOT NULL,
+  PRIMARY KEY (`idemployees`),
+  INDEX `fk_empxaddress_idx` (`addressid` ASC) VISIBLE,
+  CONSTRAINT `fk_empxaddress`
+    FOREIGN KEY (`addressid`)
+    REFERENCES `LittleLemonDB`.`address` (`idaddress`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`bookings`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`bookings` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`bookings` (
+  `idbookings` INT NOT NULL AUTO_INCREMENT,
+  `tableno` INT NOT NULL,
+  `customerid` INT NOT NULL,
+  `bookingslot` DATE NOT NULL,
+  `employeeid` INT NOT NULL,
+  PRIMARY KEY (`idbookings`),
+  INDEX `fk_bookxcustomer_idx` (`customerid` ASC) VISIBLE,
+  INDEX `fk_bookxemployees_idx` (`employeeid` ASC) VISIBLE,
+  CONSTRAINT `fk_bookxcustomer`
+    FOREIGN KEY (`customerid`)
+    REFERENCES `LittleLemonDB`.`customers` (`idcustomers`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_bookxemployees`
+    FOREIGN KEY (`employeeid`)
+    REFERENCES `LittleLemonDB`.`employees` (`idemployees`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`delivery`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`delivery` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`delivery` (
+  `iddelivery` INT NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(100) NOT NULL,
+  `date` DATE NOT NULL,
+  PRIMARY KEY (`iddelivery`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`menu_items`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`menu_items` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`menu_items` (
+  `iditems` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `type` VARCHAR(100) NOT NULL,
+  `price` INT NOT NULL,
+  PRIMARY KEY (`iditems`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`menu`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`menu` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`menu` (
+  `idmenu` INT NOT NULL AUTO_INCREMENT,
+  `itemid` INT NOT NULL,
+  `cusine` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`idmenu`),
+  INDEX `fk_menuxitems_idx` (`itemid` ASC) VISIBLE,
+  CONSTRAINT `fk_menuxitems`
+    FOREIGN KEY (`itemid`)
+    REFERENCES `LittleLemonDB`.`menu_items` (`iditems`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LittleLemonDB`.`orders`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LittleLemonDB`.`orders` ;
+
+CREATE TABLE IF NOT EXISTS `LittleLemonDB`.`orders` (
+  `idorders` INT NOT NULL AUTO_INCREMENT,
+  `menuid` INT NOT NULL,
+  `bookingid` INT NOT NULL,
+  `billamount` INT NOT NULL,
+  `quantity` INT NOT NULL,
+  `orderdate` DATE NOT NULL,
+  `statusid` INT NOT NULL,
+  PRIMARY KEY (`idorders`),
+  INDEX `fk_bookxorders_idx` (`bookingid` ASC) VISIBLE,
+  INDEX `fk_bookxdelivery_idx` (`statusid` ASC) VISIBLE,
+  INDEX `fk_ordersxmenu_idx` (`menuid` ASC) VISIBLE,
+  CONSTRAINT `fk_ordersxbook`
+    FOREIGN KEY (`bookingid`)
+    REFERENCES `LittleLemonDB`.`bookings` (`idbookings`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ordersxdelivery`
+    FOREIGN KEY (`statusid`)
+    REFERENCES `LittleLemonDB`.`delivery` (`iddelivery`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ordersxmenu`
+    FOREIGN KEY (`menuid`)
+    REFERENCES `LittleLemonDB`.`menu` (`idmenu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
