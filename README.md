@@ -31,6 +31,7 @@ Your database should now be set up and populated with tables,views, stored proce
 ### GetMaxQuantity()
 This stored procedure retrieves the maximum quantity of a specific item that has been ordered.
 
+``` sql
 DELIMITER //
 
 CREATE PROCEDURE GetMaxQuantity(OUT max_quantity INT)
@@ -40,11 +41,12 @@ BEGIN
 END //
 
 DELIMITER ;
-
+```
 ### CheckBooking()
 
 The CheckBooking stored procedure validates if a table/date is available or already booked.
 
+``` sql
 DELIMITER $$
 
 CREATE PROCEDURE CheckBooking(IN booking_date DATE, IN table_number INT)
@@ -66,6 +68,7 @@ BEGIN
 END$$
 
 DELIMITER ;
+```
 
 ### UpdateBooking()
 This stored procedure updates the booking date for a specific booking id.
