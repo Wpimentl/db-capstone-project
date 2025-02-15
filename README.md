@@ -69,7 +69,7 @@ DELIMITER ;
 
 ### UpdateBooking()
 This stored procedure updates the booking date for a specific booking id.
-
+``` sql
 DELIMITER //
 
 CREATE PROCEDURE UpdateBooking  (IN booking_id INT,IN booking_date DATE)
@@ -84,11 +84,12 @@ BEGIN
 END //
 
 DELIMITER ;
-
+```
 
 ### AddBooking() 
 This procedure adds a new booking to the database using the required columns to do so.
 
+``` sql
 DELIMITER //
 
 CREATE PROCEDURE AddBooking (IN booking_id INT,IN customer_id INT,  IN table_number INT,IN booking_date DATE)
@@ -102,11 +103,12 @@ BEGIN
 END //
 
 DELIMITER ;
-
+```
 
 ### CancelOrder()
 This stored procedure deletes a specific order from the database.
 
+``` sql
 DELIMITER $$
 #
 CREATE PROCEDURE CancelOrder(IN order_id INT)
@@ -130,11 +132,12 @@ BEGIN
 END$$
 
 DELIMITER ;
-
+```
 
 ### AddValidBooking()
 This procedure aims to securely add a new table booking record. It starts a transaction and attempts to insert a new booking record, checking the table's availability.
 
+``` sql
 DELIMITER //
 
 CREATE PROCEDURE AddValidBooking(IN booking_date DATE,  IN table_number INT)
@@ -161,7 +164,7 @@ BEGIN
 END //
 
 DELIMITER ;
-
+```
 
 ## Data Analysis with Tableau
 A Tableau workbook has been created, featuring various charts and dashboards to facilitate data analysis. You can download the workbook [here](./Capstone_charts.twb)
